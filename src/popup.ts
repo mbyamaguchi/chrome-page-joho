@@ -1,4 +1,5 @@
 import { ContentRequest, ContentResponse } from './types';
+import { GoogleGenAI } from "@google/genai";
 
 const getElementById = <T extends HTMLElement>(id: string): T | null => {
     return document.getElementById(id) as T | null;
@@ -12,6 +13,31 @@ const simpleSummarize = (text: string): string => {
     }
     const cleanedText = text.replace(/\s+/g, ' ').trim();
     return cleanedText.substring(0, maxLength) + '...（疑似要約）';
+};
+
+// APIを呼び出して要約を取得する関数
+const ai = new GoogleGenAI({ apiKey: "xxxx" });
+
+const summarizeWithAPI = async (text: string): Promise<string> => {
+    const apiKey = 'xxxx';
+    const apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+    const prompt = `以下のウェブページの本文を、箇条書きで分かりやすく要約してください。\n\n${text}`;
+
+    try {
+        // APIサーバーへリクエストを送信する
+        const response = await ai.models.generateContent({
+            model: "gemini-3-flash-preview",
+            contents: prompt,
+        });
+
+
+        // 戻ってきたデータの中から、要約されたテキストの文字列だけを抽出
+        return response.text || "要約が取得できませんでした。";
+    } catch (error) {
+        console.error('API呼び出しエラー:', error);
+        throw new Error('要約の取得に失敗しました。');
+    }
 };
 
 // ポップアップが開かれたときの処理
@@ -45,12 +71,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // 4. コンテンツスクリプトから帰ってきた情報を画面に表示
         if (response && !response.error) {
-            statusElement.textContent = "完了。";
             titleElement.textContent = response.title;
             urlElement.textContent = response.url;
 
-            // ここで疑似要約を実行し、その結果を表示
-            summaryElement.textContent = simpleSummarize(response.text);
+            statusElement.textContent = "AIで要約を確認しています...";
+            titleElement.textContent = response.title;
+            urlElement.textContent = response.url;
+
+            const summaryResult = await summarizeWithAPI(response.text);
+
+            summaryElement.textContent = summaryResult;
+            statusElement.textContent = "完了しました。";
         } else {
             throw new Error(response?.error || "応答がありませんでした。");
         }
