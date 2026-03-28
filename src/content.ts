@@ -7,13 +7,22 @@ chrome.runtime.onMessage.addListener(
         if (request.action === 'extractText') {
             try {
                 // ページの全テキストを取得する
-                const allText = document.body.innerText;
+                const mainContent = document.querySelector('article')
+                    || document.querySelector('main')
+                    || document.body;
+
+                let extractedText = mainContent.innerText || "";
+
+                const MAX_LENGTH = 5000;
+                if (extractedText.length > MAX_LENGTH) {
+                    extractedText = extractedText.substring(0, MAX_LENGTH);
+                }
 
                 // タイトル、URL、抽出したテキストを返す
                 sendResponse({
                     title: document.title,
                     url: location.href,
-                    text: allText
+                    text: extractedText
                 });
             } catch (error) {
                 sendResponse({
