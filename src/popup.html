@@ -9,6 +9,7 @@
             padding: 15px;
             font-family: sans-serif;
             color: #333;
+            margin: 0;
         }
 
         h3 {
@@ -17,27 +18,37 @@
             color: #0056b3;
         }
 
+        #status-message {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+
         .info-box {
             word-wrap: break-word;
-            /* 長いURLを折り返す */
             margin-bottom: 15px;
             padding: 10px;
-            background: #f8f9fa;
+            background-color: #f8f9fa;
             border: 1px solid #dee2e6;
             border-radius: 6px;
             font-size: 13px;
+            max-height: 200px;
+            overflow-y: auto;
         }
     </style>
 </head>
 
 <body>
+    <div id="status-message">処理中です...</div>
     <h3>ページのタイトル:</h3>
-    <div id="page-title" class="info-box">情報を取得しています...</div>
+    <div id="page-title" class="info-box">-</div>
     <h3>ページのURL:</h3>
-    <div id="page-url" class="info-box">情報を取得しています...</div>
+    <div id="page-url" class="info-box">-</div>
+    <h3>本文の要約（疑似）:</h3>
+    <div id="page-summary" class="info-box">-</div>
 
     <script src="popup.js"></script>
-</body>
 </body>
 
 </html>
